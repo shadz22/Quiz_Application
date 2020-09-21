@@ -14,11 +14,22 @@ var quizController = (function() {
 //******* UI Controller ********
 var UIController = (function() {
 
+  var domItems = {
+    //Admin Panel Elements:
+    questInsertBtn: document.getElementById("question-insert-btn")
+  };
+
+  return {
+    getDomItems: domItems
+  };
 
 })();
 
 //******** Controller *********
 var controller = (function(quizCtrl, UICtrl) {
 
+  UICtrl.getDomItems.questInsertBtn.addEventListener('click', function() {
+    
+  })
 
 })(quizController, UIController);
