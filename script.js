@@ -23,13 +23,14 @@ var quizController = (function() {
 
   return {
     addQuestionOnLocalStorage: function(newQuesText, opts) {
-      var optionsArr, corrAns, newQuestion, questionId, getStoredQuestions;
+      var optionsArr, corrAns, newQuestion, questionId, getStoredQuestions, isChecked;
 
       if(questionLocalStorage.getQuestionCollection() === null) {
         questionLocalStorage.setQuestionCollection([]);
       } 
 
       optionsArr = [];
+      isChecked = false;
 
       for(var i = 0; i < opts.length; i++) {
         if(opts[i].value !== "") {
@@ -38,6 +39,7 @@ var quizController = (function() {
 
         if(opts[i].previousElementSibling.checked && opts[i].value !== "") {
           corrAns = opts[i].value;
+          isChecked = true;
         }
       }
 
@@ -49,12 +51,34 @@ var quizController = (function() {
         questionId = 0;
       }
 
-      newQuestion = new Question(questionId, newQuesText.value, optionsArr, corrAns);
+      if(newQuesText.value !== "") {
+        if(optionsArr.length > 1) {
+          if(isChecked) {
+            newQuestion = new Question(questionId, newQuesText.value, optionsArr, corrAns);
 
-      getStoredQuestions = questionLocalStorage.getQuestionCollection();
-      getStoredQuestions.push(newQuestion);
-      questionLocalStorage.setQuestionCollection(getStoredQuestions);
-      console.log(questionLocalStorage.getQuestionCollection());
+            getStoredQuestions = questionLocalStorage.getQuestionCollection();
+
+            getStoredQuestions.push(newQuestion);
+
+            questionLocalStorage.setQuestionCollection(getStoredQuestions);
+
+            // Clear text input and the 'answer options' after inserting each new questions:
+            newQuesText.value = "";
+            for(var x = 0; x < opts.length; x++) {
+              opts[x].value = "";
+              opts[x].previousElementSibling.checked = false;
+            }
+
+            console.log(questionLocalStorage.getQuestionCollection());
+          } else {
+            alert("You didn't select the correct answer, or you selected the option without any value");
+          }
+        } else {
+            alert("You must insert at least 2 options");
+        }
+      } else {
+          alert("Please insert a question");
+      }
     }
   };
 
