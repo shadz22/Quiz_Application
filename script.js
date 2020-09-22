@@ -23,7 +23,7 @@ var quizController = (function() {
 
   return {
     addQuestionOnLocalStorage: function(newQuesText, opts) {
-      var optionsArr, corrAns, newQuestion, questionId;
+      var optionsArr, corrAns, newQuestion, questionId, getStoredQuestions;
 
       if(questionLocalStorage.getQuestionCollection() === null) {
         questionLocalStorage.setQuestionCollection([]);
@@ -50,7 +50,11 @@ var quizController = (function() {
       }
 
       newQuestion = new Question(questionId, newQuesText.value, optionsArr, corrAns);
-      console.log(newQuestion);
+
+      getStoredQuestions = questionLocalStorage.getQuestionCollection();
+      getStoredQuestions.push(newQuestion);
+      questionLocalStorage.setQuestionCollection(getStoredQuestions);
+      console.log(questionLocalStorage.getQuestionCollection());
     }
   };
 
