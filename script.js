@@ -10,13 +10,13 @@ var quizController = (function() {
   }
 
   var questionLocalStorage = {
-    setQuestionCollection = function(newCollection) {
+    setQuestionCollection: function(newCollection) {
       localStorage.setItem("questionCollection", JSON.stringify(newCollection));
     },
-    getQuestionCollection = function() {
-      return JSON.parse(localStorage.getItem("questionCollection"));
+    getQuestionCollection: function() {
+      return JSON.parse(localStorage.getItem("questionCollection")); // this returns an array
     },
-    removeQuestionCollection = function() {
+    removeQuestionCollection: function() {
       localStorage.removeItem("questionCollection");
     }
   };
@@ -25,8 +25,11 @@ var quizController = (function() {
     addQuestionOnLocalStorage: function(newQuesText, opts) {
       var optionsArr, corrAns, newQuestion, questionId;
 
+      if(questionLocalStorage.getQuestionCollection() === null) {
+        questionLocalStorage.setQuestionCollection([]);
+      } 
+
       optionsArr = [];
-      questionId = 0;
 
       for(var i = 0; i < opts.length; i++) {
         if(opts[i].value !== "") {
@@ -36,6 +39,14 @@ var quizController = (function() {
         if(opts[i].previousElementSibling.checked && opts[i].value !== "") {
           corrAns = opts[i].value;
         }
+      }
+
+      // setting the id number:
+      if(questionLocalStorage.getQuestionCollection().length > 0) {
+        questionId = questionLocalStorage.getQuestionCollection()[questionLocalStorage.getQuestionCollection().length - 1].id + 1;
+
+      } else {
+        questionId = 0;
       }
 
       newQuestion = new Question(questionId, newQuesText.value, optionsArr, corrAns);
