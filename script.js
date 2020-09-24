@@ -24,7 +24,14 @@ var quizController = (function() {
     }
   };
 
+  if(questionLocalStorage.getQuestionCollection() === null) {
+    questionLocalStorage.setQuestionCollection([]);
+  } 
+
   return {
+
+    getQuestsLocalStorage: questionLocalStorage,
+
     addQuestionOnLocalStorage: function(newQuesText, opts) {
       var optionsArr, corrAns, newQuestion, questionId, getStoredQuestions, isChecked;
 
@@ -74,14 +81,19 @@ var quizController = (function() {
             }
 
             console.log(questionLocalStorage.getQuestionCollection());
+            return true;
+            
           } else {
             alert("You didn't select the correct answer, or you selected the option without any value");
+            return false;
           }
         } else {
             alert("You must insert at least 2 options");
+            return false;
         }
       } else {
           alert("Please insert a question");
+          return false;
       }
     }
   };
@@ -100,7 +112,8 @@ var UIController = (function() {
     questInsertBtn: document.getElementById("question-insert-btn"),
     newQuestionText: document.getElementById("new-question-text"),
     adminOptions: document.querySelectorAll(".admin-option"),
-    adminOptionsContainer: document.querySelector(".admin-options-container")
+    adminOptionsContainer: document.querySelector(".admin-options-container"),
+    insertedQuestionsWrapper: document.querySelector(".inserted-questions-wrapper")
 
   };
 
@@ -126,7 +139,26 @@ var UIController = (function() {
       }
 
       domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener("focus", addInput);
+    },
+
+    // Make the questions to be displayed at the bottom of the page, as they are added
+    createQuestionList: function(getQuestions) {
+      var questHTML, numberingArr;
+
+      numberingArr = [];
+
+      domItems.insertedQuestionsWrapper.innerHTML = "";
+
+      for( var i = 0; i < getQuestions.getQuestionCollection().length; i++) {
+
+        numberingArr.push(i + 1);
+
+        questHTML = '<p><span>' + numberingArr[i] + '. ' + getQuestions.getQuestionCollection()[i].questionText + '</span><button id="question-' + getQuestions.getQuestionCollection()[i].id + '">Edit</button></p>';
+
+        domItems.insertedQuestionsWrapper.insertAdjacentHTML("afterbegin", questHTML);
+      }
     }
+
   };
 
 })();
@@ -142,11 +174,17 @@ var controller = (function(quizCtrl, UICtrl) {
 
   UICtrl.addInputDynamically();
 
+  UICtrl.createQuestionList(quizCtrl.getQuestsLocalStorage);
+
   selectedDomItems.questInsertBtn.addEventListener('click', function() {
 
     var adminOptions = document.querySelectorAll('.admin-option');
 
-    quizCtrl.addQuestionOnLocalStorage(selectedDomItems.newQuestionText, adminOptions);
+    var checkBoolean = quizCtrl.addQuestionOnLocalStorage(selectedDomItems.newQuestionText, adminOptions);
+
+    if(checkBoolean) {
+      UICtrl.createQuestionList(quizCtrl.getQuestsLocalStorage);
+    }
 
   })
 
