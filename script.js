@@ -1,4 +1,7 @@
-//******* Quiz Controller *********** 
+/************************************
+ ******** Quiz Controller ***********
+ ************************************/ 
+
 var quizController = (function() {
 
   //***** Question Constructor ********
@@ -51,6 +54,7 @@ var quizController = (function() {
         questionId = 0;
       }
 
+      // Adding validations to save data in local storage
       if(newQuesText.value !== "") {
         if(optionsArr.length > 1) {
           if(isChecked) {
@@ -84,30 +88,65 @@ var quizController = (function() {
 
 })();
 
-//******* UI Controller ********
+
+/************************************
+ ******** UI Controller ***********
+ ************************************/
+
 var UIController = (function() {
 
   var domItems = {
     //Admin Panel Elements:
     questInsertBtn: document.getElementById("question-insert-btn"),
     newQuestionText: document.getElementById("new-question-text"),
-    adminOptions: document.querySelectorAll(".admin-option")
+    adminOptions: document.querySelectorAll(".admin-option"),
+    adminOptionsContainer: document.querySelector(".admin-options-container")
 
   };
 
   return {
-    getDomItems: domItems
+    getDomItems: domItems,
+
+    addInputDynamically: function() {
+
+      var addInput = function() {
+
+        var inputHTML, z;
+
+        z = document.querySelector('.admin-option').length;
+
+        inputHTML = '<div class="admin-option-wrapper"><input type="radio" class="admin-option-' + z + '" name="answer" value="' + z + '"><input type="text" class="admin-option admin-option-' + z + '" value=""></div>';
+
+        domItems.adminOptionsContainer.insertAdjacentHTML('beforeend', inputHTML);
+
+        domItems.adminOptionsContainer.lastElementChild.previousElementSibling.lastElementChild.removeEventListener('focus', addInput);
+
+        domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener('focus', addInput);
+
+      }
+
+      domItems.adminOptionsContainer.lastElementChild.lastElementChild.addEventListener("focus", addInput);
+    }
   };
 
 })();
 
-//******** Controller *********
+
+/************************************
+ *********** Controller *************
+ ************************************/ 
+
 var controller = (function(quizCtrl, UICtrl) {
 
   var selectedDomItems = UICtrl.getDomItems;
 
+  UICtrl.addInputDynamically();
+
   selectedDomItems.questInsertBtn.addEventListener('click', function() {
-    quizCtrl.addQuestionOnLocalStorage(selectedDomItems.newQuestionText, selectedDomItems.adminOptions);
+
+    var adminOptions = document.querySelectorAll('.admin-option');
+
+    quizCtrl.addQuestionOnLocalStorage(selectedDomItems.newQuestionText, adminOptions);
 
   })
 
